@@ -3,17 +3,17 @@ var gulp = require('gulp'),
     watchify = require('watchify'),
     tsify = require('tsify'),
     pretty = require('prettysize'),
-    merge = require('lodash.merge'),
+    assign = require('lodash.merge'),
     source = require('vinyl-source-stream'),
     buffer = require('vinyl-buffer'),
     sourcemaps = require('gulp-sourcemaps'),
-    uglify = require('gulp-uglify'),
-    stream = require('stream'),
-    babelify = require('babelify');
+    uglify = require('gulp-uglify')
+    babelify = require('babelify'),
+    stream = require('stream');
 
 var defaultOptions = {
   watch: false,
-  src: ['./app/app.ts', './typings/index.d.ts'],
+  src: ['./app/app.ts', './typings/main.d.ts'],
   outputPath: 'www/build/js/',
   outputFile: 'app.bundle.js',
   minify: false,
@@ -27,7 +27,6 @@ var defaultOptions = {
   uglifyOptions: {},
   onError: function(err){
     console.error(err.toString());
-    this.emit('end');
   },
   onLog: function(log){
     console.log((log = log.split(' '), log[0] = pretty(log[0]), log.join(' ')));
@@ -35,7 +34,7 @@ var defaultOptions = {
 }
 
 module.exports = function(options) {
-  options = merge(defaultOptions, options);
+  var options = assign(defaultOptions, options);
 
   var b = browserify(options.src, options.browserifyOptions)
     .plugin(tsify, options.tsifyOptions)
@@ -46,7 +45,8 @@ module.exports = function(options) {
         'polyfill': false,
         'regenerator': true
       }], 'syntax-async-generators', 'transform-regenerator'],
-    }));
+  }));
+;
 
   if (options.watch) {
     b = watchify(b, options.watchifyOptions);
@@ -64,7 +64,7 @@ module.exports = function(options) {
       .pipe(buffer())
       .pipe(debug ? sourcemaps.init({ loadMaps: true }) : noop())
       .pipe(options.minify ? uglify(options.uglifyOptions) : noop())
-      .pipe(debug ? sourcemaps.write('./',{includeContent:true, sourceRoot:'../../../'}) : noop())
+      .pipe(debug ? sourcemaps.write('./') : noop())
       .pipe(gulp.dest(options.outputPath));
   }
 
