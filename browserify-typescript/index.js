@@ -8,7 +8,8 @@ var gulp = require('gulp'),
     buffer = require('vinyl-buffer'),
     sourcemaps = require('gulp-sourcemaps'),
     uglify = require('gulp-uglify'),
-    stream = require('stream');
+    stream = require('stream'),
+    babelify = require('babelify');
 
 var defaultOptions = {
   watch: false,
