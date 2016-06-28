@@ -37,7 +37,15 @@ module.exports = function(options) {
   options = merge(defaultOptions, options);
 
   var b = browserify(options.src, options.browserifyOptions)
-    .plugin(tsify, options.tsifyOptions);
+    .plugin(tsify, options.tsifyOptions)
+    .transform(babelify.configure({
+      extensions: ['.js', '.ts', '.json'],
+      presets: ['es2015'],
+      plugins: [['transform-runtime', {
+        'polyfill': false,
+        'regenerator': true
+      }], 'syntax-async-generators', 'transform-regenerator'],
+    }));
 
   if (options.watch) {
     b = watchify(b, options.watchifyOptions);
